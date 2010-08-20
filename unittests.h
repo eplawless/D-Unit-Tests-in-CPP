@@ -587,8 +587,9 @@ namespace unittests {
 #   define REQUIRE_CLOSE(a, b)
 #   define REQUIRE(a)
 #   define testsuite namespace
-#   define unittesthook 
-#   define classunittest
+#   define unittesthook template <typename T> bool _testhook()
+#   define classunittest(classname, testname) class testname##classname##Key {}; \
+	template<> bool classname::_testhook<testname##classname##Key>() 
 
 #endif
 
