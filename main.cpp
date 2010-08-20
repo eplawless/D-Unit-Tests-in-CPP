@@ -1,3 +1,5 @@
+// #define RUN_UNIT_TESTS to enable unit tests
+
 #include "unittests.h"
 #include <exception>
 #include <iostream>
