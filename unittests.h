@@ -467,7 +467,7 @@ Stream& operator<<( Stream& os, JadedHoboConsole::ConsoleColors const& colors )
 namespace unittests 
 {
 	namespace color = JadedHoboConsole;
-	
+
 	std::map<std::string, bool(*)()> test_list;
 
 	bool addUnitTest(std::string const& name, bool(*func)()) {
@@ -556,6 +556,7 @@ namespace unittests
 	}
 }
 
+#   define STRINGIFY_HELPER(a) #a
 #   define UNIT_TEST_HELPER(name, testNum) bool _unittest_##name##testNum(); \
 	static bool _unittest_##name##testNum##added = unittests::addUnitTest(#name, _unittest_##name##testNum); \
 	bool _unittest_##name##testNum()
@@ -564,6 +565,14 @@ namespace unittests
 #   define REQUIRE_EQUAL(a, b) unittests::require_equal(#a, #b, a, b)
 #   define REQUIRE_CLOSE(a, b) unittests::require_close(#a, #b, a, b)
 #   define REQUIRE(a) unittests::require(#a, a)
+#   define testsuite namespace
+#   define unittesthook template <typename T> bool _testhook()
+#   define classunittest(classname, testname) class testname##classname##Key {}; \
+	bool run##testname##classname##test(); \
+	template<> bool classname::_testhook<testname##classname##Key>(); \
+	static bool _unittest_##testname##classname##added = unittests::addUnitTest(STRINGIFY_HELPER(classname::testname), run##testname##classname##test); \
+	bool run##testname##classname##test() { classname instance; return instance._testhook<testname##classname##Key>(); } \
+	template<> bool classname::_testhook<testname##classname##Key>() 
 
 #else // if RUN_UNIT_TESTS is undefined
 
@@ -577,6 +586,9 @@ namespace unittests {
 #   define REQUIRE_EQUAL(a, b)
 #   define REQUIRE_CLOSE(a, b)
 #   define REQUIRE(a)
+#   define testsuite namespace
+#   define unittesthook 
+#   define classunittest
 
 #endif
 

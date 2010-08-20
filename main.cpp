@@ -1,8 +1,8 @@
-// #define RUN_UNIT_TESTS to enable unit tests
-
 #include "unittests.h"
 #include <exception>
 #include <iostream>
+#include <vector>
+using std::vector;
 using std::exception;
 using std::cout;
 using std::endl;
@@ -11,13 +11,19 @@ int bork() {
 	return 3;
 }
 
-unittest(bork) {
-	int result = bork();
-	return result == 3;
-}
+testsuite BorkSuite
+{
+	int integerHarness = 100;
 
-unittest(fail) {
-	return false;
+	unittest(bork) {
+		REQUIRE_EQUAL(integerHarness, 100);
+		int result = bork();
+		return result == 3;
+	}
+
+	unittest(fail) {
+		return false;
+	}
 }
 
 unittest(exception) {
@@ -36,6 +42,23 @@ unittest(require_equal_pass) {
 	int what = 10;
 	int why = 20;
 	REQUIRE_EQUAL(what, why-10);
+	return true;
+}
+
+class Berk {
+	int privot, data;
+public:
+	Berk():privot(20),data(30){}
+	unittesthook;
+};
+
+classunittest(Berk, whablamo) {
+	REQUIRE_EQUAL(privot, data-10);
+	return true;
+}
+
+classunittest(Berk, whablamoz) {
+	REQUIRE_EQUAL(privot+80, 100);
 	return true;
 }
 
