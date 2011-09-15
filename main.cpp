@@ -11,8 +11,7 @@ struct Base
     int foo() { std::cout << "2 "; return 4; }
 };
 
-unittest (Base) 
-{
+unittest {
     {
        	Base b;
 	REQUIRE_EQUAL(b.foo(), 4);
