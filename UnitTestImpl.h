@@ -49,22 +49,30 @@ class TestManager
 public: // methods
     TestManager() : m_options(OUTPUT_NONE) {}
 
-    bool addTest(const String& quoted_path, int line, TestFunc func)
+    bool addTest(
+	const String& quoted_path,
+       	int line,
+       	TestFunc func)
     {
 	if (func == NULL)
 	    return false;
 
-	const String &name = getTestName(quoted_path, line);
+	const String& name = getTestName(quoted_path, line);
 	m_tests[name] = func;
 	return true;
     }
 
-    bool addTest(const String& name, TestFunc func)
+    bool addTest(
+	const String& name,
+	const String& quoted_path,
+       	int line,
+       	TestFunc func)
     {
 	if (func == NULL)
 	    return false;
 
-	m_tests[name] = func;
+	const String& full_name = getTestName(name, quoted_path, line);
+	m_tests[full_name] = func;
 	return true;
     }
 
@@ -118,6 +126,16 @@ private: // types
     };
 
 private: // methods
+
+    String getTestName(
+	const String& name,
+	const String& quoted_path,
+	int line)
+    {
+	std::stringstream ss;
+	ss << "\"" << name << "\" " << getTestName(quoted_path, line);
+	return ss.str();
+    }
 
     String getTestName(const String& quoted_path, int line)
     {

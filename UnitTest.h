@@ -36,11 +36,24 @@
 	    file, line, _unittest_##line##counter); \
     static void _unittest_##line##counter()
 
+#define NAMED_TEST_HELPER(name, file, line, counter) \
+    static void _unittest_##line##counter(); \
+    static bool _unittest_##line##counter##added = \
+	UNIT_TEST_NS::getTestManager().addTest( \
+	    name, file, line, _unittest_##line##counter); \
+    static void _unittest_##line##counter()
+
 #define UNIT_TEST_INTERMEDIATE_HELPER(file, line, counter) \
     UNIT_TEST_HELPER(file, line, counter)
 
+#define NAMED_TEST_INTERMEDIATE_HELPER(name, file, line, counter) \
+    NAMED_TEST_HELPER(name, file, line, counter)
+
 #define unittest \
     UNIT_TEST_INTERMEDIATE_HELPER(__FILE__, __LINE__, __COUNTER__)
+
+#define namedtest(name) \
+    NAMED_TEST_INTERMEDIATE_HELPER(name, __FILE__, __LINE__, __COUNTER__)
 
 #define REQUIRE_COUT_EQUAL(a) \
     UNIT_TEST_NS::require_stream_equal("REQUIRE_COUT_EQUAL", std::cout, (a));
@@ -75,6 +88,9 @@
     UNIT_TEST_HELPER(file, line, counter)
 
 #define unittest \
+    UNIT_TEST_INTERMEDIATE_HELPER(__FILE__, __LINE__, __COUNTER__)
+
+#define namedtest(name) \
     UNIT_TEST_INTERMEDIATE_HELPER(__FILE__, __LINE__, __COUNTER__)
 
 #define UNIT_TEST_HOOKS
