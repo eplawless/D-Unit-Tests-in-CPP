@@ -18,10 +18,10 @@
 #define STRINGIFY_HELPER(a) #a
 
 #define UNIT_TEST_HELPER(name, testNum) \
-    bool _unittest_##name##testNum(); \
+    void _unittest_##name##testNum(); \
     static bool _unittest_##name##testNum##added = \
 	UNIT_TEST_NS::g_testManager.addTest(#name, _unittest_##name##testNum); \
-    bool _unittest_##name##testNum()
+    void _unittest_##name##testNum()
 
 #define UNIT_TEST_INTERMEDIATE_HELPER(name, testNum) \
     UNIT_TEST_HELPER(name, testNum)
@@ -32,21 +32,33 @@
     UNIT_TEST_INTERMEDIATE_HELPER(testname, __LINE__)
 
 #define unittesthook \
-    template <typename T> bool _testhook()
+    template <typename T> void _testhook()
 
 #define classunittest(classname, testname) \
     class testname##classname##Key {}; \
-    bool run##testname##classname##test(); \
-    template<> bool classname::_testhook<testname##classname##Key>(); \
+    void run##testname##classname##test(); \
+    template<> void classname::_testhook<testname##classname##Key>(); \
     static bool _unittest_##testname##classname##added = \
 	UNIT_TEST_NS::g_testManager.addTest( \
 	    STRINGIFY_HELPER(classname::testname), \
 	    run##testname##classname##test); \
-    bool run##testname##classname##test() { \
+    void run##testname##classname##test() { \
 	classname instance; \
-	return instance._testhook<testname##classname##Key>(); \
+	instance._testhook<testname##classname##Key>(); \
     } \
-    template<> bool classname::_testhook<testname##classname##Key>() 
+    template<> void classname::_testhook<testname##classname##Key>() 
+
+#define REQUIRE_COUT_EQUAL(a) \
+    UNIT_TEST_NS::require_stream_equal("REQUIRE_COUT_EQUAL", std::cout, (a));
+
+#define REQUIRE_COUT_PREFIX(a) \
+    UNIT_TEST_NS::require_stream_prefix("REQUIRE_COUT_PREFIX", std::cout, (a));
+
+#define REQUIRE_CERR_EQUAL(a) \
+    UNIT_TEST_NS::require_stream_equal("REQUIRE_CERR_EQUAL", std::cerr, (a));
+
+#define REQUIRE_CERR_PREFIX(a) \
+    UNIT_TEST_NS::require_stream_prefix("REQUIRE_CERR_PREFIX", std::cerr, (a));
 
 #define REQUIRE_EQUAL(a, b) \
     UNIT_TEST_NS::require_equal(#a, #b, a, b)
@@ -76,11 +88,11 @@
 #define testsuite namespace
 
 #define unittesthook \
-    template <typename T> bool _testhook()
+    template <typename T> void _testhook()
 
 #define classunittest(classname, testname) \
     class testname##classname##Key {}; \
-    template<> bool classname::_testhook<testname##classname##Key>() 
+    template<> void classname::_testhook<testname##classname##Key>() 
 
 #define REQUIRE_EQUAL(a, b)
 

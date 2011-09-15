@@ -36,7 +36,7 @@ isColor(OutputOptions options)
 /// @}
 
 // Helper Types
-typedef bool (*TestFunc)();
+typedef void (*TestFunc)();
 typedef std::string		    String;
 typedef std::exception		    Exception;
 typedef std::pair<String, TestFunc> TestEntry;
@@ -69,7 +69,8 @@ public: // methods
 	int num_tests = m_tests.size();
 	int passed_tests = 0;
 
-	std::cout << "Running " << num_tests << " tests...\n" << std::endl;
+	std::cout << "Running " << num_tests << " test" 
+	    << (num_tests > 1 ? "s" : "") << "...\n" << std::endl;
 	for (TestIterator it = m_tests.begin(); it != m_tests.end(); ++it) {
 	    passed_tests += runTest(it->first, it->second);
 	}
@@ -77,19 +78,50 @@ public: // methods
 	printResult(num_tests, passed_tests);
     }
 
+private: // types
+
+    class StreamRedirector 
+    {
+    public: // methods
+
+	template <typename OutStream, typename ErrStream>
+	StreamRedirector(OutStream& out, ErrStream& err) 
+	{
+	    out.str("");
+	    err.str("");
+	    cout_backup = std::cout.rdbuf();
+	    cerr_backup = std::cerr.rdbuf();
+	    std::cout.rdbuf(out.rdbuf());
+	    std::cerr.rdbuf(err.rdbuf());
+	}
+
+	~StreamRedirector()
+	{
+	    std::cout.rdbuf(cout_backup);
+	    std::cerr.rdbuf(cerr_backup);
+	}
+
+    private: // members
+
+	std::streambuf* cout_backup;
+	std::streambuf* cerr_backup;
+    };
+
 private: // methods
 
     bool runTest(const String& name, TestFunc test_func)
     {
+	bool passed = true;
 	try {
 	    printTestName(name);
-	    bool passed = test_func();
-	    passed ? printPassed(name) : printFailed(name);
-	    return passed;
+	    StreamRedirector redirect(m_new_cout, m_new_cerr);
+	    test_func();
 	} catch (const Exception& ex) {
 	    printFailed(name, ex.what());
 	    return false;
 	}
+	printPassed(name);
+	return passed;
     }
 
     void printResult(int num_tests, int passed_tests)
@@ -101,7 +133,7 @@ private: // methods
 	else
 	    std::cout << fg_yellow;
 
-	std::cout << passed_tests << " of " << num_tests << " tests passed.\n"
+	std::cout << "\n" << passed_tests << " of " << num_tests << " tests passed.\n"
 	    << m_defaultColors << std::endl;
     }
 
@@ -137,9 +169,11 @@ private: // methods
     }
 
 private: // members
-    TestMap	    m_tests;
-    ConsoleColors   m_defaultColors;
-    OutputOptions   m_options;
+    TestMap             m_tests;
+    ConsoleColors       m_defaultColors;
+    OutputOptions       m_options;
+    std::stringstream   m_new_cout;
+    std::stringstream   m_new_cerr;
 };
 
 // Global Variables
