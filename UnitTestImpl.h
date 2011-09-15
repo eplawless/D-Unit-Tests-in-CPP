@@ -49,6 +49,16 @@ class TestManager
 public: // methods
     TestManager() : m_options(OUTPUT_NONE) {}
 
+    bool addTest(const String& quoted_path, int line, TestFunc func)
+    {
+	if (func == NULL)
+	    return false;
+
+	const String &name = getTestName(quoted_path, line);
+	m_tests[name] = func;
+	return true;
+    }
+
     bool addTest(const String& name, TestFunc func)
     {
 	if (func == NULL)
@@ -108,6 +118,22 @@ private: // types
     };
 
 private: // methods
+
+    String getTestName(const String& quoted_path, int line)
+    {
+	size_t end = quoted_path.find_last_of("\"");
+	size_t last_slash = quoted_path.find_last_of("\\/");
+	size_t first_quote = quoted_path.find_first_of("\"");
+	size_t begin = 0;
+	if (last_slash != String::npos)
+	    begin = last_slash+1;
+	else if (first_quote != String::npos)
+	    begin = first_quote+1;
+
+	std::stringstream ss;
+	ss << "at " << quoted_path.substr(begin, end) << ":" << line;
+	return ss.str();
+    }
 
     bool runTest(const String& name, TestFunc test_func)
     {
@@ -177,7 +203,10 @@ private: // members
 };
 
 // Global Variables
-TestManager g_testManager;
+TestManager& getTestManager() {
+    static TestManager test_manager;
+    return test_manager;
+}
 
 } // namespace
 
