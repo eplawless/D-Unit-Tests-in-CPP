@@ -203,10 +203,7 @@ private: // members
 };
 
 // Global Variables
-TestManager& getTestManager() {
-    static TestManager test_manager;
-    return test_manager;
-}
+TestManager& getTestManager();
 
 } // namespace
 

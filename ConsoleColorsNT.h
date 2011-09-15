@@ -103,7 +103,7 @@ private: // members
 };
 
 /// Global Console Manipulation
-namespace { WindowsConsole g_console; }
+WindowsConsole& getConsole();
 
 /// Current Console Colors
 class ConsoleColors
@@ -113,8 +113,8 @@ public: // methods
 	: fg(0xF) // white
 	, bg(0x0) // black
     {
-	g_console.updateInfo();
-	WORD color = g_console.getColorAttrib();
+	getConsole().updateInfo();
+	WORD color = getConsole().getColorAttrib();
 	fg = color & 0xF;
 	bg = color >> 4;
     }
@@ -130,7 +130,7 @@ template <typename OStream>
 inline OStream& clear(OStream& ostream)
 {
     ostream.flush();
-    g_console.clear();
+    getConsole().clear();
     return ostream;
 }
 
@@ -138,7 +138,7 @@ inline OStream& clear(OStream& ostream)
     inline std::ostream& prefix##_##color(std::ostream& ostream) \
     { \
         ostream.flush(); \
-        g_console.setColor(prefix##_hi_##color, mask); \
+        getConsole().setColor(prefix##_hi_##color, mask); \
         return ostream; \
     }
 
@@ -159,11 +159,11 @@ DEFINE_ALL_COLOR_STREAM_MANIP_FUNCS(bg, fg_mask)
 #undef DEFINE_ALL_COLOR_STREAM_MANIP_FUNCS
 #undef DEFINE_COLOR_MANIP
 
-std::ostream& operator<<(std::ostream& ostream, const ConsoleColors& colors)
+inline std::ostream& operator<<(std::ostream& ostream, const ConsoleColors& colors)
 {
     ostream.flush();
-    g_console.setColor(colors.fg, bg_mask);
-    g_console.setColor(colors.bg, fg_mask);
+    getConsole().setColor(colors.fg, bg_mask);
+    getConsole().setColor(colors.bg, fg_mask);
     return ostream;
 }
 /// @}

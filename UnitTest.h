@@ -11,6 +11,18 @@
 #include "UnitTestImpl.h"
 #include "UnitTestHelpers.h"
 
+#define UNIT_TEST_HOOKS \
+    namespace UNIT_TEST_NS { \
+       	TestManager& getTestManager() { \
+	    static TestManager manager; \
+	    return manager; \
+	} \
+	WindowsConsole& getConsole() { \
+	    static WindowsConsole console; \
+	    return console; \
+	} \
+    }
+
 #define RUN_UNIT_TESTS \
     UNIT_TEST_NS::getTestManager().runTests(); \
     exit(0);
@@ -18,11 +30,11 @@
 #define STRINGIFY_HELPER(a) #a
 
 #define UNIT_TEST_HELPER(file, line, counter) \
-    void _unittest_##line##counter(); \
+    static void _unittest_##line##counter(); \
     static bool _unittest_##line##counter##added = \
 	UNIT_TEST_NS::getTestManager().addTest( \
 	    file, line, _unittest_##line##counter); \
-    void _unittest_##line##counter()
+    static void _unittest_##line##counter()
 
 #define UNIT_TEST_INTERMEDIATE_HELPER(file, line, counter) \
     UNIT_TEST_HELPER(file, line, counter)
@@ -57,7 +69,7 @@
 #else
 
 #define UNIT_TEST_HELPER(file, line, counter) \
-    template<typename T> void deadFunction##line##counter()
+    template<typename T> static void deadFunction##line##counter()
 
 #define UNIT_TEST_INTERMEDIATE_HELPER(file, line, counter) \
     UNIT_TEST_HELPER(file, line, counter)
@@ -65,6 +77,7 @@
 #define unittest \
     UNIT_TEST_INTERMEDIATE_HELPER(__FILE__, __LINE__, __COUNTER__)
 
+#define UNIT_TEST_HOOKS
 #define RUN_UNIT_TESTS
 #define REQUIRE_COUT_EQUAL(a)
 #define REQUIRE_COUT_PREFIX(a)

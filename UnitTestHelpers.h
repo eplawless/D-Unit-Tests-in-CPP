@@ -38,7 +38,7 @@ struct ScopedArray {
     T* data;
 };
 
-size_t get_buffer(
+static size_t get_buffer(
     const std::ostream& stream,
     ScopedArray<char>& buffer,
     size_t buffer_size)
@@ -52,7 +52,7 @@ size_t get_buffer(
     return chars_read;
 }
 
-size_t require_stream_prefix(
+static size_t require_stream_prefix(
     const String& name,
     const std::ostream& stream,
     const String& value)
@@ -68,7 +68,7 @@ size_t require_stream_prefix(
     throw Exception(err.str().c_str());
 }
 
-void require_stream_equal(
+static void require_stream_equal(
     const String& name,
     const std::ostream& stream,
     const String& value)
@@ -89,7 +89,7 @@ void require_stream_equal(
 
 
 template <typename LHSType, typename RHSType>
-void require_equal(
+static void require_equal(
     const String& lhs_name,
     const String& rhs_name, 
     const LHSType& lhs_value, 
@@ -105,7 +105,7 @@ void require_equal(
     throw Exception(stream.str().c_str());
 }
 
-void require(const String& expression, bool value) 
+static void require(const String& expression, bool value) 
 {
     if (value)
 	return;
