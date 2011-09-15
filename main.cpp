@@ -19,9 +19,12 @@ unittest {
     REQUIRE_COUT_PREFIX("1 2 3");
 }
 
+UNIT_TEST_HOOKS;
+
 void main()
 {
     RUN_UNIT_TESTS;
+
     std::cout << "NORMAL EXECUTION" << std::endl;
 }
 
