@@ -17,6 +17,7 @@ unittest {
 	REQUIRE_EQUAL(b.foo(), 4);
     }
     REQUIRE_COUT_PREFIX("1 2 3");
+    REQUIRE_COUT_EQUAL("1 2 3 ");
 }
 
 namedtest("@#>^#SYMBOLLLLS") {
