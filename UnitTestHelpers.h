@@ -33,10 +33,8 @@ struct RawBytes
 };
 
 bool operator==(const RawBytes& lhs, const RawBytes& rhs) {
-    size_t min_size = std::min<size_t>(lhs.size, rhs.size); 
-    return strcmp(lhs.name, rhs.name) == 0
-	&& lhs.size == rhs.size
-	&& strncmp(lhs.data, rhs.data, min_size) == 0;
+    return lhs.size == rhs.size
+	&& strncmp(lhs.data, rhs.data, lhs.size) == 0;
 }
 
 std::ostream& operator<<(std::ostream& ostream, const RawBytes& bytes) {
