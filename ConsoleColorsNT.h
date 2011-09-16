@@ -156,6 +156,9 @@ inline OStream& clear(OStream& ostream)
 DEFINE_ALL_COLOR_STREAM_MANIP_FUNCS(fg, bg_mask)
 DEFINE_ALL_COLOR_STREAM_MANIP_FUNCS(bg, fg_mask)
 
+inline std::ostream& fg_null(std::ostream& ostream) { return ostream; }
+typedef std::ostream& (*StreamManipFunc)(std::ostream&);
+
 #undef DEFINE_ALL_COLOR_STREAM_MANIP_FUNCS
 #undef DEFINE_COLOR_MANIP
 

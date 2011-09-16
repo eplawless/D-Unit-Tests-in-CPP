@@ -11,10 +11,6 @@
 
 namespace UNIT_TEST_NS {
 
-typedef std::string String;
-typedef std::exception Exception;
-typedef std::stringstream SStream;
-
 // TODO: this is terrible
 template <typename T>
 struct ScopedArray {
@@ -53,9 +49,9 @@ static size_t get_buffer(
 }
 
 static size_t require_stream_prefix(
-    const String& name,
+    const std::string& name,
     const std::ostream& stream,
-    const String& value)
+    const std::string& value)
 {
     const size_t value_size = value.length();
     ScopedArray<char> buffer(value_size+1);
@@ -63,15 +59,15 @@ static size_t require_stream_prefix(
     if (value == buffer.data)
 	return chars_read;
 
-    SStream err;
+    std::stringstream err;
     err << name << " failed: " << buffer.data << " != " << value;
-    throw Exception(err.str().c_str());
+    throw std::exception(err.str().c_str());
 }
 
 static void require_stream_equal(
-    const String& name,
+    const std::string& name,
     const std::ostream& stream,
-    const String& value)
+    const std::string& value)
 {
     size_t chars_read = require_stream_prefix(name, stream, value);
     size_t chars_in_stream = stream.rdbuf()->in_avail();
@@ -81,39 +77,39 @@ static void require_stream_equal(
     ScopedArray<char> buffer(chars_in_stream+1);
     get_buffer(stream, buffer, chars_in_stream+1);
 
-    SStream err;
+    std::stringstream err;
     err << name << " failed; matched \"" << value 
 	<< "\", but there was extra input: " << buffer.data;
-    throw Exception(err.str().c_str());
+    throw std::exception(err.str().c_str());
 }
 
 
 template <typename LHSType, typename RHSType>
 static void require_equal(
-    const String& lhs_name,
-    const String& rhs_name, 
+    const std::string& lhs_name,
+    const std::string& rhs_name, 
     const LHSType& lhs_value, 
     const RHSType& rhs_value) 
 {
     if (lhs_value == rhs_value)
 	return;
 
-    SStream stream;
+    std::stringstream stream;
     stream << "REQUIRE_EQUAL failed: " << lhs_name << " != " << rhs_name 
 	<< " (values " << lhs_value << ", " << rhs_value << ")";
 
-    throw Exception(stream.str().c_str());
+    throw std::exception(stream.str().c_str());
 }
 
-static void require(const String& expression, bool value) 
+static void require(const std::string& expression, bool value) 
 {
     if (value)
 	return;
 
-    SStream stream;
+    std::stringstream stream;
     stream << "REQUIRE failed: " << expression;
 
-    throw Exception(stream.str().c_str());
+    throw std::exception(stream.str().c_str());
 }
 
 } // namespace
