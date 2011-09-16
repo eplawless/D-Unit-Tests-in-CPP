@@ -6,10 +6,51 @@
 #include <sstream>
 #include <vector>
 #include <exception>
+#include <typeinfo>
+#include <iostream>
 
 #include "NS.h"
 
 namespace UNIT_TEST_NS {
+
+/// @{
+/// Conversion to raw bytes. This allows types which have no comparison
+/// operators or stream output operators to be compared and output. It's
+/// kind of a terrible hack, but that's okay.
+struct RawBytes 
+{
+    template <typename T>
+    RawBytes(const T& value) 
+	: size(sizeof(T)) 
+	, name(typeid(T).name())
+    {
+	data = reinterpret_cast<const char*>(&value);
+    }
+
+    const char *name;
+    const int size;
+    const char *data;
+};
+
+bool operator==(const RawBytes& lhs, const RawBytes& rhs) {
+    size_t min_size = std::min<size_t>(lhs.size, rhs.size); 
+    return strcmp(lhs.name, rhs.name) == 0
+	&& lhs.size == rhs.size
+	&& strncmp(lhs.data, rhs.data, min_size) == 0;
+}
+
+std::ostream& operator<<(std::ostream& ostream, const RawBytes& bytes) {
+    ostream << bytes.name << " bytes [" << std::hex;
+    ostream.fill('0');
+    for (int idx = 0; idx < bytes.size; ++idx) {
+	if (idx != 0)
+	    ostream << " ";
+	ostream << std::setw(2) << static_cast<size_t>(bytes.data[idx]);
+    }
+    ostream << "]" << std::dec;
+    return ostream;
+}
+/// @}
 
 // TODO: this is terrible
 template <typename T>
