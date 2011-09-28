@@ -20,36 +20,39 @@ namespace UNIT_TEST_NS {
 /// Output Options
 enum OutputOptions 
 {
-    OUTPUT_NONE    = 0,
-    OUTPUT_VERBOSE = 1,
-    OUTPUT_COLOR   = 2,
-    OUTPUT_FULL    = OUTPUT_VERBOSE|OUTPUT_COLOR
+    OUTPUT_NONE    		= 0x0,
+    OUTPUT_VERBOSE 		= 0x1,
+    OUTPUT_COLOR   		= 0x2,
+	OUTPUT_REDIRECT_STREAMS = 0x4,
+    OUTPUT_FULL    		= OUTPUT_VERBOSE|OUTPUT_COLOR|OUTPUT_REDIRECT_STREAMS
 };
 
 /// @{
 /// Default Output Options
-#ifdef UNIT_TESTS_DISABLE_COLOR
-#ifdef UNIT_TESTS_QUIET
-#define DEFAULT_OUTPUT_OPTIONS OUTPUT_NONE
-#else
-#define DEFAULT_OUTPUT_OPTIONS OUTPUT_VERBOSE
+static const int DEFAULT_OUTPUT_OPTIONS = OUTPUT_NONE
+#ifndef UNIT_TESTS_DISABLE_COLOR
+	| OUTPUT_COLOR
 #endif
-#else
-#ifdef UNIT_TESTS_QUIET
-#define DEFAULT_OUTPUT_OPTIONS OUTPUT_COLOR
-#else
-#define DEFAULT_OUTPUT_OPTIONS OUTPUT_FULL
+#ifndef UNIT_TESTS_QUIET
+	| OUTPUT_VERBOSE
 #endif
+#ifdef UNIT_TESTS_ENABLE_STREAM_REDIRECT
+	| OUTPUT_REDIRECT_STREAMS
 #endif
+	;
 /// @}
 
 static inline bool 
-isVerbose(OutputOptions options) 
+isVerbose(int options) 
 { return options & OUTPUT_VERBOSE; }
 
 static inline bool 
-isColor(OutputOptions options) 
+isColor(int options) 
 { return options & OUTPUT_COLOR; }
+
+static inline bool
+shouldRedirectStreams(int options)
+{ return options & OUTPUT_REDIRECT_STREAMS; }
 /// @}
 
 // Helper Types
@@ -97,7 +100,7 @@ public: // methods
 	return true;
     }
 
-    void runTests(OutputOptions options = DEFAULT_OUTPUT_OPTIONS)
+    void runTests(int options = DEFAULT_OUTPUT_OPTIONS)
     {
 	if (m_tests.empty()) {
 	    std::cout << m_defaultColors << "No tests defined." << std::endl;
@@ -179,8 +182,12 @@ private: // methods
 	std::string test_string = getTestString(id, test.name);
 	try {
 	    printTestName(test_string);
-	    StreamRedirector redirect(m_new_cout, m_new_cerr);
-	    test.function();
+		if (shouldRedirectStreams(m_options)) {
+			StreamRedirector redirect(m_new_cout, m_new_cerr);
+			test.function();
+		} else {
+			test.function();
+		}
 	} catch (const std::exception& ex) {
 	    printFailed(test_string, ex.what());
 	    return false;
@@ -262,7 +269,7 @@ private: // members
     StreamManipFunc	m_successColor;
     StreamManipFunc	m_warningColor;
     StreamManipFunc	m_errorColor;
-    OutputOptions       m_options;
+    int       			m_options;
     std::stringstream   m_new_cout;
     std::stringstream   m_new_cerr;
 };
