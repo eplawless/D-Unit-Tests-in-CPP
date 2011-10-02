@@ -80,11 +80,11 @@ static size_t get_buffer(
 {
     buffer.resize(buffer_size);
     std::streambuf* sbuf = stream.rdbuf();
-    const size_t chars_read = sbuf->sgetn(buffer.data, buffer_size-1);
+	std::streamsize chars_read = sbuf->sgetn(buffer.data, buffer_size-1);
     buffer.data[chars_read] = '\0';
-    for (size_t idx = 0; idx < chars_read; ++idx)
+    for (std::streamsize idx = 0; idx < chars_read; ++idx)
 	sbuf->sungetc();
-    return chars_read;
+    return static_cast<size_t>(chars_read);
 }
 
 static size_t require_stream_prefix(
@@ -109,7 +109,7 @@ static void require_stream_equal(
     const std::string& value)
 {
     size_t chars_read = require_stream_prefix(name, stream, value);
-    size_t chars_in_stream = stream.rdbuf()->in_avail();
+    size_t chars_in_stream = static_cast<size_t>(stream.rdbuf()->in_avail());
     if (chars_read == chars_in_stream)
 	return;
 

@@ -44,15 +44,15 @@ static const int DEFAULT_OUTPUT_OPTIONS = OUTPUT_NONE
 
 static inline bool 
 isVerbose(int options) 
-{ return options & OUTPUT_VERBOSE; }
+{ return (options & OUTPUT_VERBOSE) != 0; }
 
 static inline bool 
 isColor(int options) 
-{ return options & OUTPUT_COLOR; }
+{ return (options & OUTPUT_COLOR) != 0; }
 
 static inline bool
 shouldRedirectStreams(int options)
-{ return options & OUTPUT_REDIRECT_STREAMS; }
+{ return (options & OUTPUT_REDIRECT_STREAMS) != 0; }
 /// @}
 
 // Helper Types

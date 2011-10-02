@@ -64,7 +64,7 @@ public: // methods
 
 	m_bufferInfo.wAttributes &= mask;
 	m_bufferInfo.wAttributes |= rgbi;
-	return SetConsoleTextAttribute(m_hConsole, m_bufferInfo.wAttributes);
+	return SetConsoleTextAttribute(m_hConsole, m_bufferInfo.wAttributes) != FALSE;
     }
 
     bool clear() 
@@ -87,7 +87,8 @@ public: // methods
 	if (m_hConsole == INVALID_HANDLE_VALUE)
 	    return false;
 
-	bool got_info = GetConsoleScreenBufferInfo(m_hConsole, &m_bufferInfo);
+	bool got_info = GetConsoleScreenBufferInfo(
+		m_hConsole, &m_bufferInfo) != FALSE;
 	if (!got_info)
 	    return false;
 
